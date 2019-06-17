@@ -23,52 +23,31 @@
 namespace itk
 {
 
-template< typename TSourcePointSet, typename TTargetPointSet >
-PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet >
+template< typename TSourcePointSet, typename TTargetPointSet, typename TValue >
+PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TValue >
 ::PointSetMultiscaleOptimalTransportMethod()
 {
-;
 }
 
-template< typename TSourcePointSet, typename TTargetPointSet >
+template< typename TSourcePointSet, typename TTargetPointSet, typename TValue >
 void
-PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet >
+PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TValue >
 ::Initialize()
 {
-
 }
 
-template< typename TSourcePointSet, typename TTargetPointSet >
+template< typename TSourcePointSet, typename TTargetPointSet, typename TValue >
 void
-PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet >
+PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TValue >
 ::GenerateData()
 {
-
 }
 
-template< typename TSourcePointSet, typename TTargetPointSet >
-const typename PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet >::TransformOutputType *
-PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet >
-::GetOutput() const
-{
-  return static_cast< const TransportPlan * >( this->ProcessObject::GetOutput(0) );
-}
 
-template< typename TSourcePointSet, typename TTargetPointSet >
-DataObject::Pointer
-PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet >
-::MakeOutput(DataObjectPointerArraySizeType output)
-{
-  if (output > 0)
-  {
-    itkExceptionMacro("MakeOutput request for an output number larger than the expected number of outputs.");
-  }
-  return TransportPlan::New().GetPointer();
-}
 
-template< typename TSourcePointSet, typename TTargetPointSet >
+template< typename TSourcePointSet, typename TTargetPointSet, typename TValue >
 ModifiedTimeType
-PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet >
+PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TValue >
 ::GetMTime() const
 {
   ModifiedTimeType mtime = Superclass::GetMTime();
@@ -77,13 +56,12 @@ PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet >
   return mtime;
 }
 
-template< typename TSourcePointSet, typename TTargetPointSet >
+template< typename TSourcePointSet, typename TTargetPointSet, typename TValue >
 void
-PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet >
+PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TValue >
 ::PrintSelf(std::ostream & os, Indent indent) const
 {
   Superclass::PrintSelf(os, indent);
-
 }
 } // end namespace itk
 #endif

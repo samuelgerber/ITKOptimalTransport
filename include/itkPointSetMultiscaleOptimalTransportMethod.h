@@ -20,6 +20,10 @@
 
 #include "itkPointSetMultiscaleOptimalTransportMethod.h"
 
+#include "TransportLPSolver.h"
+#include "PropagationStrategy.h"
+#include "NeighborhoodStrategy.h"
+
 namespace itk
 
 /** \class PointSetOptimalTransportMethod
@@ -28,9 +32,9 @@ namespace itk
  *
  * \ingroup ITKOptimalTransport
  */
-template< typename TSourcePointSet, typename TTargetPointSet >
-class ITK_TEMPLATE_EXPORT PointSetMultiscaleOptimalTransportMethod : 
-  public PointSetOptimalTransportMethod<TSourcePointSet, TTargetPointSet> {
+template< typename TSourcePointSet, typename TTargetPointSet, typename TValue >
+class ITK_TEMPLATE_EXPORT PointSetMultiscaleOptimalTransportMethod :
+  public PointSetOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TValue > {
 public:
   ITK_DISALLOW_COPY_AND_ASSIGN(PointSetMultiscaleOptimalTransportMethod);
 
@@ -54,6 +58,25 @@ public:
   using TargetPointSetType = TTargetPointSet;
   using TargetPointSetConstPointer = typename TargetPointSetType::ConstPointer;
 
+  using PropagationStrategyType = typename PropagationStrategy<TValue>;
+  using NeighborhoodStrategyType = typename NieghborhoodStrategy<TValue>;
+
+  itkSetMacro(PropagationStrategy1, PropagationStrategyType);
+  itkSetMacro(PropagationStrategy2, PropagationStrategyType);
+
+  itkBooleanMacro(MatchScale);
+  itkBooleanMacro(ScaleMass);
+
+  itkSetMacro(TransportType, TransportType);
+  itkGetMacro(TransportType, TransportType);
+
+  itkSetMacro(Lambda, double);
+  itkGetMacro(Lambda, double);
+
+  itkSetMacro(MassCost, double);
+  itkGetMacro(MassCost, double);
+
+  void AddNeighborhoodPropagationStrategy(NeighborhoodPropagationStrategy *strategy);
 
 protected:
   PointSetMultiscaleOptimalTransportMethod();
@@ -61,6 +84,19 @@ protected:
   void PrintSelf(std::ostream & os, Indent indent) const override;
 
   void GenerateData() override;
+
+private:
+
+  LPSolver *m_Solver;
+  std::vector< NeighborhoodStrategyType* > m_NeighborhoodPropagations;
+  PropagationStrategyType *m_PropagationStrategy1;
+  PropagationStrategyType *m_PropagationStrategy2;
+  bool m_MatchScale;
+  bool m_ScaleMass;
+  TransportType m_TransportType;
+  double m_Lambda;
+  double m_MassCost;
+
 
 
 };

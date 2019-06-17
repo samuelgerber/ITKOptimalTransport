@@ -32,7 +32,7 @@ namespace itk
 {
 
 /** \class TransportPlam
- *  \brief 
+ *  \brief
  *
  *  */
 
@@ -54,18 +54,16 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  
-  using std::map< std::pair< TSourePointIdentifier, TTargetPointIdentifier>, TValue> TransportMap;
+  using std::pair< TSourePointIdentifier, TTargetPointIdentifier> TransportPath;
+  using std::map< TransportPath, TValue> TransportMap;
 
-  void AddPath(TSourePointIdentifier source, TTargetPointIdentifier target, TValue value);
+  void AddPath(TSourePointIdentifier source, TTargetPointIdentifier target, TValue weight);
 
-  TransportMap GetMap();
+  TransportMap &GetMap();
 
 protected:
   /** Constructor */
   TransportPlan();
-
-  /** Destructor: deletes the root node and the empty terminal node. */
   ~TransportPlan() override;
 
   void PrintSelf( std::ostream & os, Indent indent ) const override;

@@ -23,23 +23,23 @@
 namespace itk
 {
 
-template< typename TSourcePointSet, typename TTargetPointSet >
-PointSetOptimalTransportMethod< TSourcePointSet, TTargetPointSet >
+template< typename TSourcePointSet, typename TTargetPointSet, typename TValue >
+PointSetOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TValue >
 ::PointSetOptimalTransportMethod()
 {
   this->SetNumberOfRequiredOutputs(1);
 
 
-  TransportPlanOutputPointer transformDecorator =
+  TransportPlanOutputPointer output =
     itkDynamicCastInDebugMode< TransportPlanType * >(this->MakeOutput(0).GetPointer() );
 
-  this->ProcessObject::SetNthOutput( 0, transformDecorator.GetPointer() );
+  this->ProcessObject::SetNthOutput( 0, output.GetPointer() );
 }
 
 
-template< typename TSourcePointSet, typename TTargetPointSet >
+template< typename TSourcePointSet, typename TTargetPointSet, typename TValue >
 void
-PointSetOptimalTransportMethod< TSourcePointSet, TTargetPointSet >
+PointSetOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TValue >
 ::Initialize()
 {
   if ( !m_SourcePointSet )
@@ -54,35 +54,35 @@ PointSetOptimalTransportMethod< TSourcePointSet, TTargetPointSet >
 
 
   // Connect the transform to the Decorator
-  auto * transformOutput = static_cast< TransformOutputType * >( this->ProcessObject::GetOutput(0) );
+  auto * transportOutput = static_cast< TransportPlanType * >( this->ProcessObject::GetOutput(0) );
 
-  transformOutput->Set( m_Transform );
+  transportOutput->Set( m_TransportPlan );
 }
 
 
-template< typename TSourcePointSet, typename TTargetPointSet >
-const typename PointSetOptimalTransportMethod< TSourcePointSet, TTargetPointSet >::TransformOutputType *
-PointSetOptimalTransportMethod< TSourcePointSet, TTargetPointSet >
+template< typename TSourcePointSet, typename TTargetPointSet, typename TValue >
+const typename PointSetOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TValue >::TransformOutputType *
+PointSetOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TValue >
 ::GetOutput() const
 {
-  return static_cast< const TransformOutputType * >( this->ProcessObject::GetOutput(0) );
+  return static_cast< const TransportPlanType * >( this->ProcessObject::GetOutput(0) );
 }
 
-template< typename TSourcePointSet, typename TTargetPointSet >
+template< typename TSourcePointSet, typename TTargetPointSet, typename TValue >
 DataObject::Pointer
-PointSetOptimalTransportMethod< TSourcePointSet, TTargetPointSet >
+PointSetOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TValue >
 ::MakeOutput(DataObjectPointerArraySizeType output)
 {
   if (output > 0)
   {
     itkExceptionMacro("MakeOutput request for an output number larger than the expected number of outputs.");
   }
-  return TransformOutputType::New().GetPointer();
+  return TransportPlanType::New().GetPointer();
 }
 
-template< typename TSourcePointSet, typename TTargetPointSet >
+template< typename TSourcePointSet, typename TTargetPointSet, typename TValue >
 ModifiedTimeType
-PointSetOptimalTransportMethod< TSourcePointSet, TTargetPointSet >
+PointSetOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TValue >
 ::GetMTime() const
 {
   ModifiedTimeType mtime = Superclass::GetMTime();
@@ -105,9 +105,9 @@ PointSetOptimalTransportMethod< TSourcePointSet, TTargetPointSet >
   return mtime;
 }
 
-template< typename TSourcePointSet, typename TTargetPointSet >
+template< typename TSourcePointSet, typename TTargetPointSet, typename TValue >
 void
-PointSetOptimalTransportMethod< TSourcePointSet, TTargetPointSet >
+PointSetOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TValue >
 ::PrintSelf(std::ostream & os, Indent indent) const
 {
   Superclass::PrintSelf(os, indent);

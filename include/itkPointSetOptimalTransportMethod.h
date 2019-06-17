@@ -30,7 +30,7 @@ namespace itk
  *
  * \ingroup ITKOptimalTransport
  */
-template< typename TSourcePointSet, typename TTargetPointSet >
+template< typename TSourcePointSet, typename TTargetPointSet, typename TValue = double >
 class ITK_TEMPLATE_EXPORT PointSetOptimalTransportMethod : public ProcessObject
 {
 public:
@@ -45,7 +45,9 @@ public:
   using TargetPointIdentifier = typename TTargetPointSet::PointIdentifier;
   using TargetPointType = typename TTargetPointSet::PointType;
 
-  using std::map< std::pair<SourcePointIdentifier, TargetPointIdentifier>, double > TransportPlan;
+
+  using TransportPlanType = typename TransportPlan<SourcePointIdentifier, TargetPointIdentifier, TValue>
+  using TransportPlanPointer = typename TransportPlan::Pointer;
 
   /** Standard class type aliases. */
   using Self = PointSetOptimalTransportMethod;
@@ -99,6 +101,7 @@ protected:
 private:
   TargetPointSetConstPointer m_TargetPointSet;
   SourcePointSetConstPointer  m_SourcePointSet;
+  TransportPlanPointer m_TransportPlan;
 
 };
 } // end namespace itk
