@@ -16,6 +16,4 @@ ITKOptimalTransport
 Overview
 --------
 
-This module implements algorithms for optimal transport on images and point clouds.
-
-This module implements algorithms for optimal transport on images and point clouds.
+Algorithms for optimal transport on images and point clouds in ITK.
