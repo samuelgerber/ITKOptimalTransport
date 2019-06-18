@@ -19,6 +19,8 @@
 #define itkPointSetMultiscaleOptimalTransportMethod_hxx
 
 #include "itkPointSetMultiscaleOptimalTransportMethod.h"
+#include "PointSetGMRADataObject.h"
+#include "IKMTree.h"
 
 namespace itk
 {
@@ -41,6 +43,41 @@ void
 PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TValue >
 ::GenerateData()
 {
+  //Create Source GMRA object
+  PointSetGMRADataObject source(m_SourcePointSet);
+  std::vector<int> sourcePts(source.numberOfPoints() );
+  for(unsigned int i=0; i<sourcePts.size(); i++){
+    sourcePts[i] = i;
+  };
+  IKMTree<double> *gmraSource = new IKMTree<double>(source);
+  gmra->setStoppingCriterium( m_SourceStoppingCriterium );
+  gmra->setSplitCriterium( m_SourceSplitCriterium );
+  gmra->dataFactory = new L2GMRAKmeansDataFactory<double>();
+  gmra->epsilon = m_SourceEpsilon;
+  gmra->nKids = m_SourceNKids;
+  gmra->threshold = m_SourceThreshold;
+  gmra->maxIter = m_SourceMaxIterations;
+  gmra->minPoints = m_SourceMinimumPoints;
+  gmra->addPoints(sourcePts);
+
+
+  //Create Target GMRA object
+  PointSetGMRADataObject target(m_TargetPointSet);
+  std::vector<int> targetPts(target.numberOfPoints() );
+  for(unsigned int i=0; i<targetPts.size(); i++){
+    targetPts[i] = i;
+  };
+  IKMTree<double> *gmraTarget = new IKMTree<double>(target);
+  gmra->setStoppingCriterium( m_TargetStoppingCriterium );
+  gmra->setSplitCriterium( m_TargetSplitCriterium );
+  gmra->dataFactory = new L2GMRAKmeansDataFactory<double>();
+  gmra->epsilon = m_TargetEpsilon;
+  gmra->nKids = m_TargetNKids;
+  gmra->threshold = m_TargetThreshold;
+  gmra->maxIter = m_TargetMaxIterations;
+  gmra->minPoints = m_TargetMinimumPoints;
+  gmra->addPoints(targetPts);
+
 }
 
 
