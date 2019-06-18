@@ -21,6 +21,7 @@
 #include "itkPointSetMultiscaleOptimalTransportMethod.h"
 #include "PointSetGMRADataObject.h"
 #include "IKMTree.h"
+#include "LemonSolver.h"
 
 namespace itk
 {
@@ -29,7 +30,18 @@ template< typename TSourcePointSet, typename TTargetPointSet, typename TValue >
 PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TValue >
 ::PointSetMultiscaleOptimalTransportMethod()
 {
+  m_Solver = new LemonSolver();
+
 }
+
+template< typename TSourcePointSet, typename TTargetPointSet, typename TValue >
+PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TValue >
+::~PointSetMultiscaleOptimalTransportMethod()
+{
+  delete m_Solver;
+
+}
+
 
 template< typename TSourcePointSet, typename TTargetPointSet, typename TValue >
 void
@@ -46,8 +58,10 @@ PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TVal
   //Create Source GMRA object
   PointSetGMRADataObject source(m_SourcePointSet);
   std::vector<int> sourcePts(source.numberOfPoints() );
+  std::vector<double> sourceWeights(source.numberOfPoints() );
   for(unsigned int i=0; i<sourcePts.size(); i++){
     sourcePts[i] = i;
+    sourceWeights[i] = 1;
   };
   IKMTree<double> *gmraSource = new IKMTree<double>(source);
   gmra->setStoppingCriterium( m_SourceStoppingCriterium );
@@ -64,8 +78,10 @@ PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TVal
   //Create Target GMRA object
   PointSetGMRADataObject target(m_TargetPointSet);
   std::vector<int> targetPts(target.numberOfPoints() );
+  std::vector<double> targetWeights(target.numberOfPoints() );
   for(unsigned int i=0; i<targetPts.size(); i++){
     targetPts[i] = i;
+    targetWeights[i] = 1.0;
   };
   IKMTree<double> *gmraTarget = new IKMTree<double>(target);
   gmra->setStoppingCriterium( m_TargetStoppingCriterium );
@@ -77,6 +93,39 @@ PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TVal
   gmra->maxIter = m_TargetMaxIterations;
   gmra->minPoints = m_TargetMinimumPoints;
   gmra->addPoints(targetPts);
+
+  
+  NodeDistance<double> *dist = new CenterNodeDistance<double>( new EuclideanMetric<double>() );
+  gmraSource->computeRadii(dist);
+  gmraSource->computeLocalRadii(dist);
+  
+  gmraTarget->computeRadii(dist);
+  gmraTarget->computeLocalRadii(dist);
+
+  GenericGMRANeighborhood<double> sourceNeighborhood(gmraSource, dist);
+  GenericGMRANeighborhood<double> targetNeighborhood(gmraTarget, dist);
+
+  std::vector< MultiscaleTransportLevel<double> * > sourceLevels =
+      GMRAMultiscaleTransportLevel<double>::buildTransportLevels(sourceNeighborhood, sourceWeights, false);
+
+  std::vector< MultiscaleTransportLevel<double> * > targetLevels =
+      GMRAMultiscaleTransportLevel<double>::buildTransportLevels(targetNeighborhood, targetWeights, false);
+
+  TransportLPSolver<double> *trpSolver =
+      new TransportLPSolver<double>( m_Solver, m_TransportType, m_MassCost, m_Lambda );
+  MultiscaleTransportLP<double> transport = new MultiscaleTransportLP<double>(&trpSolver);
+  transport.setPropagationStrategy1(m_PropagationStrategy1);
+  transport.setPropagationStrategy1(m_PropagationStrategy2);
+  for(int i=0; i< m_NeighborhoodPropagations.size(); i++){
+    transport.addNeighborhoodPropagationStrategy( m_NeighborhoodPropagations[i] );
+  }
+
+  std::vector< TransportPlan<double> * > sols = transport.solve( sourceLevels, targetLevels, 
+      m_Exponent, m_NumberOfScalesSource, m_NumberOfScalesTarget, m_MatchScale, m_ScaleMass);
+
+  delete gmraSource;
+  delete gmraTarget;
+  delete dist; 
 
 }
 
