@@ -15,42 +15,42 @@
  *  limitations under the License.
  *
  *=========================================================================*/
-#ifndef itkTransportPlan_hxx
-#define itkTransportPlan_hxx
+#ifndef itkTransportCoupling_hxx
+#define itkTransportCoupling_hxx
 
-#include "itkTransportPlan.h"
+#include "itkTransportCoupling.h"
 
 namespace itk
 {
 template<typename TSourePointIdentifier, typename TTargetPointIdentifier, typename TValue>
-TransportPlan<TSourcePointIdentifier, TTargetPointIdentifier, TValue>
-::TransportPlan()
+TransportCoupling<TSourcePointIdentifier, TTargetPointIdentifier, TValue>
+::TransportCoupling()
 {
 
 }
 
 template<typename TSourePointIdentifier, typename TTargetPointIdentifier, typename TValue>
-TransportPlan<TSourcePointIdentifier, TTargetPointIdentifier, TValue>
-::~TransportPlan()
+TransportCoupling<TSourcePointIdentifier, TTargetPointIdentifier, TValue>
+::~TransportCoupling()
 {
 
 }
 
 template<typename TSourePointIdentifier, typename TTargetPointIdentifier, typename TValue>
 void
-TransportPlan<TSourcePointIdentifier, TTargetPointIdentifier, TValue>
+TransportCoupling<TSourcePointIdentifier, TTargetPointIdentifier, TValue>
 ::PrintSelf( std::ostream &os, Indent indent ) const
 {
   Superclass::PrintSelf( os, indent );
 
-  os << indent << "TransportPlan: ";
+  os << indent << "TransportCoupling: ";
   os << indent << m_Map.size() << " paths";
 }
 
 
 template<typename TSourePointIdentifier, typename TTargetPointIdentifier, typename TValue>
 void
-TransportPlan<TSourcePointIdentifier, TTargetPointIdentifier, TValue>
+TransportCoupling<TSourcePointIdentifier, TTargetPointIdentifier, TValue>
 ::AddPath(TSourePointIdentifier source, TTargetPointIdentifier target, TValue weight)
 {
   m_Map.insert( TransportPath(source, target), weight);
@@ -59,7 +59,7 @@ TransportPlan<TSourcePointIdentifier, TTargetPointIdentifier, TValue>
 
 template<typename TSourePointIdentifier, typename TTargetPointIdentifier, typename TValue>
 TransportMap &
-TransportPlan<TSourcePointIdentifier, TTargetPointIdentifier, TValue>
+TransportCoupling<TSourcePointIdentifier, TTargetPointIdentifier, TValue>
 ::GetMap()
 {
   return m_Map;

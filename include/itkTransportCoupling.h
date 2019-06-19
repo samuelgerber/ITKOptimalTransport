@@ -15,8 +15,8 @@
  *  limitations under the License.
  *
  *=========================================================================*/
-#ifndef itkTransportPlan_h
-#define itkTransportPlan_h
+#ifndef itkTransportCoupling_h
+#define itkTransportCoupling_h
 
 #include <queue>
 #include <vector>
@@ -37,7 +37,7 @@ namespace itk
  *  */
 
 template<typename TSourePointIdentifier, typename TTargetPointIdentifier, typename TValue = double>
-class ITK_TEMPLATE_EXPORT TransportPlan:public Object
+class ITK_TEMPLATE_EXPORT TransportCoupling:public Object
 {
 public:
   ITK_DISALLOW_COPY_AND_ASSIGN(TransportPlan);
@@ -54,8 +54,8 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  using std::pair< TSourePointIdentifier, TTargetPointIdentifier> TransportPath;
-  using std::map< TransportPath, TValue> TransportMap;
+  using TransportPath = std::pair< TSourePointIdentifier, TTargetPointIdentifier>;
+  using TransportMap = std::map< TransportPath, TValue>;
 
   void AddPath(TSourePointIdentifier source, TTargetPointIdentifier target, TValue weight);
 
@@ -63,8 +63,8 @@ public:
 
 protected:
   /** Constructor */
-  TransportPlan();
-  ~TransportPlan() override;
+  TransportCoupling();
+  ~TransportCoupling() override;
 
   void PrintSelf( std::ostream & os, Indent indent ) const override;
 

@@ -31,7 +31,33 @@ PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TVal
 ::PointSetMultiscaleOptimalTransportMethod()
 {
   m_Solver = new LemonSolver();
+  m_PropagationStrategy1 = new IteratedCapacityPropagationStrategy<TValue>(3, 0);
+  m_PropagationStrategy2 = new IteratedCapacityPropagationStrategy<TValue>(3, 0);
+  m_MaxNeighborhoodSize = NumericTraits<int>:::max();
+  m_MatchScale = false;
+  m_ScaleMass = false;
+  m_Lambda = 0;
+  m_MassCost = 0;
+  m_Exponent = 2;
+  m_NumberOfScalesSource = -1;
+  m_NumberOfScalesTarget= -1;
+  m_TransportType = TransportLPSolver::BALANCED;
 
+  m_SourceSplitCriterium = IKMTree<TValue>::ADAPTIVE;
+  m_SourceStoppingCriterium = IKMTree<TValue>::RELATIVE_RADIUS;
+  m_SourceEpsilon = 0;
+  m_SourceNumberOfKids = 8;
+  m_SourceThreshold = 0.01;
+  m_SourceMaxIterations = 100;
+  m_SourceMinimumPoints = 1;
+
+  m_TargetSplitCriterium = IKMTree<TValue>::ADAPTIVE;
+  m_TargetStoppingCriterium = IKMTree<TValue>::RELATIVE_RADIUS;
+  m_TargetEpsilon = 0;
+  m_TargetNumberOfKids = 8;
+  m_TargetThreshold = 0.01;
+  m_TargetMaxIterations = 100;
+  m_TargetMinimumPoints = 1;
 }
 
 template< typename TSourcePointSet, typename TTargetPointSet, typename TValue >
@@ -39,7 +65,8 @@ PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TVal
 ::~PointSetMultiscaleOptimalTransportMethod()
 {
   delete m_Solver;
-
+  delete m_PropagationStrategy1;
+  delete m_PropagationStrategy2;
 }
 
 
@@ -68,7 +95,7 @@ PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TVal
   gmra->setSplitCriterium( m_SourceSplitCriterium );
   gmra->dataFactory = new L2GMRAKmeansDataFactory<double>();
   gmra->epsilon = m_SourceEpsilon;
-  gmra->nKids = m_SourceNKids;
+  gmra->nKids = m_SourceNumberOfKids;
   gmra->threshold = m_SourceThreshold;
   gmra->maxIter = m_SourceMaxIterations;
   gmra->minPoints = m_SourceMinimumPoints;
@@ -88,17 +115,17 @@ PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TVal
   gmra->setSplitCriterium( m_TargetSplitCriterium );
   gmra->dataFactory = new L2GMRAKmeansDataFactory<double>();
   gmra->epsilon = m_TargetEpsilon;
-  gmra->nKids = m_TargetNKids;
+  gmra->nKids = m_TargetNumberOfKids;
   gmra->threshold = m_TargetThreshold;
   gmra->maxIter = m_TargetMaxIterations;
   gmra->minPoints = m_TargetMinimumPoints;
   gmra->addPoints(targetPts);
 
-  
+
   NodeDistance<double> *dist = new CenterNodeDistance<double>( new EuclideanMetric<double>() );
   gmraSource->computeRadii(dist);
   gmraSource->computeLocalRadii(dist);
-  
+
   gmraTarget->computeRadii(dist);
   gmraTarget->computeLocalRadii(dist);
 
@@ -116,16 +143,22 @@ PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TVal
   MultiscaleTransportLP<double> transport = new MultiscaleTransportLP<double>(&trpSolver);
   transport.setPropagationStrategy1(m_PropagationStrategy1);
   transport.setPropagationStrategy1(m_PropagationStrategy2);
-  for(int i=0; i< m_NeighborhoodPropagations.size(); i++){
+  for(int i=0; i< m_NeighborhoodPropagations.size(); i++)
+    {
     transport.addNeighborhoodPropagationStrategy( m_NeighborhoodPropagations[i] );
-  }
+    }
 
-  std::vector< TransportPlan<double> * > sols = transport.solve( sourceLevels, targetLevels, 
+  std::vector< TransportPlan<double> * > sols = transport.solve( sourceLevels, targetLevels,
       m_Exponent, m_NumberOfScalesSource, m_NumberOfScalesTarget, m_MatchScale, m_ScaleMass);
 
   delete gmraSource;
   delete gmraTarget;
-  delete dist; 
+  delete dist;
+
+  for(int i = 0; i<sols.size(); i++)
+    {
+    delete sols[i];
+    }
 
 }
 

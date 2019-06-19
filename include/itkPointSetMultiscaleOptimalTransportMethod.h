@@ -87,6 +87,9 @@ protected:
 
 private:
 
+  /**
+   * Multiscale transport solver settings
+   */
   LPSolver *m_Solver;
   std::vector< NeighborhoodStrategyType* > m_NeighborhoodPropagations;
   PropagationStrategyType *m_PropagationStrategy1;
@@ -96,6 +99,32 @@ private:
   TransportType m_TransportType;
   double m_Lambda;
   double m_MassCost;
+  double m_Exponent;
+  int m_NumberOfScalesSource;
+  int m_NumberOfScalesTarget;
+  int m_MaxNeighborhoodSize;
+
+  /**
+   * GMRA (mutliscale point set representation settings)
+   */
+  SplitCriterium m_SourceSplitCriterium;
+  StoppingCriterium m_SourceStopCriterium;
+  int m_SourceMinimumPoints;
+  int m_SourceMaxIterations;
+  double m_SourceEpsilon;
+  int m_SourceNumberOfKids;
+  double m_SourceThreshold;
+
+  SplitCriterium m_TargetSplitCriterium;
+  StoppingCriterium m_TargetStopCriterium;
+  int m_TargetMinimumPoints;
+  int m_TargetMaxIterations;
+  double m_TargetEpsilon;
+  int m_TargetNumberOfKids;
+  double m_TargetThreshold;
+
+
+
 
 
 
