@@ -58,6 +58,9 @@ PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TVal
   m_TargetThreshold = 0.01;
   m_TargetMaxIterations = 100;
   m_TargetMinimumPoints = 1;
+
+
+
 }
 
 template< typename TSourcePointSet, typename TTargetPointSet, typename TValue >
@@ -91,15 +94,15 @@ PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TVal
     sourceWeights[i] = 1;
   };
   IKMTree<double> *gmraSource = new IKMTree<double>(source);
-  gmra->setStoppingCriterium( m_SourceStoppingCriterium );
-  gmra->setSplitCriterium( m_SourceSplitCriterium );
-  gmra->dataFactory = new L2GMRAKmeansDataFactory<double>();
-  gmra->epsilon = m_SourceEpsilon;
-  gmra->nKids = m_SourceNumberOfKids;
-  gmra->threshold = m_SourceThreshold;
-  gmra->maxIter = m_SourceMaxIterations;
-  gmra->minPoints = m_SourceMinimumPoints;
-  gmra->addPoints(sourcePts);
+  gmraSource->setStoppingCriterium( m_SourceStoppingCriterium );
+  gmraSource-->setSplitCriterium( m_SourceSplitCriterium );
+  gmraSource-->dataFactory = new L2GMRAKmeansDataFactory<double>();
+  gmraSource-->epsilon = m_SourceEpsilon;
+  gmraSource-->nKids = m_SourceNumberOfKids;
+  gmraSource-->threshold = m_SourceThreshold;
+  gmraSource-->maxIter = m_SourceMaxIterations;
+  gmraSource-->minPoints = m_SourceMinimumPoints;
+  gmraSource-->addPoints(sourcePts);
 
 
   //Create Target GMRA object
@@ -111,15 +114,15 @@ PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TVal
     targetWeights[i] = 1.0;
   };
   IKMTree<double> *gmraTarget = new IKMTree<double>(target);
-  gmra->setStoppingCriterium( m_TargetStoppingCriterium );
-  gmra->setSplitCriterium( m_TargetSplitCriterium );
-  gmra->dataFactory = new L2GMRAKmeansDataFactory<double>();
-  gmra->epsilon = m_TargetEpsilon;
-  gmra->nKids = m_TargetNumberOfKids;
-  gmra->threshold = m_TargetThreshold;
-  gmra->maxIter = m_TargetMaxIterations;
-  gmra->minPoints = m_TargetMinimumPoints;
-  gmra->addPoints(targetPts);
+  gmraTarget->setStoppingCriterium( m_TargetStoppingCriterium );
+  gmraTarget->setSplitCriterium( m_TargetSplitCriterium );
+  gmraTarget->dataFactory = new L2GMRAKmeansDataFactory<double>();
+  gmraTarget->epsilon = m_TargetEpsilon;
+  gmraTarget->nKids = m_TargetNumberOfKids;
+  gmraTarget->threshold = m_TargetThreshold;
+  gmraTarget->maxIter = m_TargetMaxIterations;
+  gmraTarget->minPoints = m_TargetMinimumPoints;
+  gmraTarget->addPoints(targetPts);
 
 
   NodeDistance<double> *dist = new CenterNodeDistance<double>( new EuclideanMetric<double>() );
@@ -150,6 +153,10 @@ PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TVal
 
   std::vector< TransportPlan<double> * > sols = transport.solve( sourceLevels, targetLevels,
       m_Exponent, m_NumberOfScalesSource, m_NumberOfScalesTarget, m_MatchScale, m_ScaleMass);
+
+
+
+
 
   delete gmraSource;
   delete gmraTarget;

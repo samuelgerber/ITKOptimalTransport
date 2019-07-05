@@ -21,6 +21,8 @@
 #include "itkProcessObject.h"
 #include "itkPointSet.h"
 #include "itkDataObjectDecorator.h"
+#include "itkTransportCoupling.h"
+
 
 namespace itk
 
@@ -46,8 +48,8 @@ public:
   using TargetPointType = typename TTargetPointSet::PointType;
 
 
-  using TransportPlanType = typename TransportPlan<SourcePointIdentifier, TargetPointIdentifier, TValue>
-  using TransportPlanPointer = typename TransportPlan::Pointer;
+  using TransportCouplingType = typename TransportCoupling<SourcePointIdentifier, TargetPointIdentifier, TValue>
+  using TransportCouplingPointer = typename TransportCoupling::Pointer;
 
   /** Standard class type aliases. */
   using Self = PointSetOptimalTransportMethod;
@@ -101,7 +103,7 @@ protected:
 private:
   TargetPointSetConstPointer m_TargetPointSet;
   SourcePointSetConstPointer  m_SourcePointSet;
-  TransportPlanPointer m_TransportPlan;
+  TransportCouplingPointer m_TransportCoupling;
 
 };
 } // end namespace itk

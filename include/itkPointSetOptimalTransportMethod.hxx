@@ -30,8 +30,8 @@ PointSetOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TValue >
   this->SetNumberOfRequiredOutputs(1);
 
 
-  TransportPlanOutputPointer output =
-    itkDynamicCastInDebugMode< TransportPlanType * >(this->MakeOutput(0).GetPointer() );
+  TransportCouplingOutputPointer output =
+    itkDynamicCastInDebugMode< TransportCouplingType * >(this->MakeOutput(0).GetPointer() );
 
   this->ProcessObject::SetNthOutput( 0, output.GetPointer() );
 }
@@ -54,9 +54,9 @@ PointSetOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TValue >
 
 
   // Connect the transform to the Decorator
-  auto * transportOutput = static_cast< TransportPlanType * >( this->ProcessObject::GetOutput(0) );
+  auto * transportOutput = static_cast< TransportCouplingType * >( this->ProcessObject::GetOutput(0) );
 
-  transportOutput->Set( m_TransportPlan );
+  transportOutput->Set( m_TransportCoupling );
 }
 
 
@@ -65,7 +65,7 @@ const typename PointSetOptimalTransportMethod< TSourcePointSet, TTargetPointSet,
 PointSetOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TValue >
 ::GetOutput() const
 {
-  return static_cast< const TransportPlanType * >( this->ProcessObject::GetOutput(0) );
+  return static_cast< const TransportCouplingType * >( this->ProcessObject::GetOutput(0) );
 }
 
 template< typename TSourcePointSet, typename TTargetPointSet, typename TValue >
@@ -77,7 +77,7 @@ PointSetOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TValue >
   {
     itkExceptionMacro("MakeOutput request for an output number larger than the expected number of outputs.");
   }
-  return TransportPlanType::New().GetPointer();
+  return TransportCouplingType::New().GetPointer();
 }
 
 template< typename TSourcePointSet, typename TTargetPointSet, typename TValue >
