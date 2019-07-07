@@ -83,7 +83,7 @@ int itkPointSetMultiscaleOptimalTransportTest( int argc, char *argv[] )
     movingPoints->SetPoint( i, movingPoint );
     }
 
-  using OptimalTransportType = itk::PointSetMultiscaleOptimalTransportMethod<PointSetType, PointSetTyupe, double>;
+  using OptimalTransportType = itk::PointSetMultiscaleOptimalTransportMethod<PointSetType, PointSetType, double>;
 
   OptimalTransportType::Pointer ot = OptimalTransportType::New();
   ot->SetSourcePointSet( fixedPoints );
@@ -91,7 +91,7 @@ int itkPointSetMultiscaleOptimalTransportTest( int argc, char *argv[] )
 
   ot->Update();
 
-  //OptimalTransportType::TransportCouplingPointer coupling = ot->GetOutput() 
+  //OptimalTransportType::TransportCouplingPointer coupling = ot->GetOutput()
 
 
   return EXIT_SUCCESS;

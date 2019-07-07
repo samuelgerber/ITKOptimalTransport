@@ -24,6 +24,9 @@
 #include "LemonSolver.h"
 #include "IteratedCapacityPropagationStrategy.h"
 #include "EigenEuclideanMetric.h"
+#include "GMRANeighborhood.h"
+#include "GMRAMultiscaleTransport.h"
+#include "MultiscaleTransportLP.h"
 
 namespace itk
 {
@@ -75,13 +78,6 @@ PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TVal
 }
 
 
-template< typename TSourcePointSet, typename TTargetPointSet, typename TValue >
-void
-PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TValue >
-::Initialize()
-{
-  Superclass::Initialize();
-}
 
 template< typename TSourcePointSet, typename TTargetPointSet, typename TValue >
 void
@@ -89,34 +85,35 @@ PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TVal
 ::GenerateData()
 {
   //Create Source GMRA object
-  PointSetGMRADataObject source(m_SourcePointSet);
+  PointSetGMRADataObject<TSourcePointSet> source( this->GetSourcePointSet() );
   std::vector<int> sourcePts(source.numberOfPoints() );
   std::vector<double> sourceWeights(source.numberOfPoints() );
   for(unsigned int i=0; i<sourcePts.size(); i++){
     sourcePts[i] = i;
     sourceWeights[i] = 1;
   };
-  IKMTree<double> *gmraSource = new IKMTree<double>(source);
+
+  IKMTree<double> *gmraSource = new IKMTree<double>( &source );
   gmraSource->setStoppingCriterium( m_SourceStoppingCriterium );
-  gmraSource-->setSplitCriterium( m_SourceSplitCriterium );
-  gmraSource-->dataFactory = new L2GMRAKmeansDataFactory<double>();
-  gmraSource-->epsilon = m_SourceEpsilon;
-  gmraSource-->nKids = m_SourceNumberOfKids;
-  gmraSource-->threshold = m_SourceThreshold;
-  gmraSource-->maxIter = m_SourceMaxIterations;
-  gmraSource-->minPoints = m_SourceMinimumPoints;
-  gmraSource-->addPoints(sourcePts);
+  gmraSource->setSplitCriterium( m_SourceSplitCriterium );
+  gmraSource->dataFactory = new L2GMRAKmeansDataFactory<double>();
+  gmraSource->epsilon = m_SourceEpsilon;
+  gmraSource->nKids = m_SourceNumberOfKids;
+  gmraSource->threshold = m_SourceThreshold;
+  gmraSource->maxIter = m_SourceMaxIterations;
+  gmraSource->minPoints = m_SourceMinimumPoints;
+  gmraSource->addPoints(sourcePts);
 
 
   //Create Target GMRA object
-  PointSetGMRADataObject target(m_TargetPointSet);
+  PointSetGMRADataObject<TTargetPointSet> target( this->GetTargetPointSet() );
   std::vector<int> targetPts(target.numberOfPoints() );
   std::vector<double> targetWeights(target.numberOfPoints() );
   for(unsigned int i=0; i<targetPts.size(); i++){
     targetPts[i] = i;
     targetWeights[i] = 1.0;
   };
-  IKMTree<double> *gmraTarget = new IKMTree<double>(target);
+  IKMTree<double> *gmraTarget = new IKMTree<double>( &target );
   gmraTarget->setStoppingCriterium( m_TargetStoppingCriterium );
   gmraTarget->setSplitCriterium( m_TargetSplitCriterium );
   gmraTarget->dataFactory = new L2GMRAKmeansDataFactory<double>();
@@ -144,14 +141,13 @@ PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TVal
   std::vector< MultiscaleTransportLevel<double> * > targetLevels =
       GMRAMultiscaleTransportLevel<double>::buildTransportLevels(targetNeighborhood, targetWeights, false);
 
-  TransportLPSolver<double> *trpSolver =
-      new TransportLPSolver<double>( m_Solver, m_TransportType, m_MassCost, m_Lambda );
-  MultiscaleTransportLP<double> transport = new MultiscaleTransportLP<double>(&trpSolver);
+  TransportLPSolver<double> trpSolver( m_Solver, m_TransportType, m_MassCost, m_Lambda );
+  MultiscaleTransportLP<double> transport( &trpSolver );
   transport.setPropagationStrategy1(m_PropagationStrategy1);
   transport.setPropagationStrategy1(m_PropagationStrategy2);
-  for(int i=0; i< m_NeighborhoodPropagations.size(); i++)
+  for(int i=0; i< m_NeighborhoodStrategies.size(); i++)
     {
-    transport.addNeighborhoodStrategy( m_NeighborhoodStrategies[i] );
+    transport.addNeighborhodStrategy( m_NeighborhoodStrategies[i] );
     }
 
   std::vector< TransportPlan<double> * > sols = transport.solve( sourceLevels, targetLevels,
@@ -161,10 +157,11 @@ PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TVal
 
   auto * transportOutput = static_cast< TransportCouplingType * >( this->ProcessObject::GetOutput(0) );
 
+  using Path = TransportPlan<double>::Path;
   TransportPlan<double> *sol = sols[sols.size()-1];
   for(sol->pathIteratorBegin(); ! sol->pathIteratorIsAtEnd(); sol->pathIteratorNext() )
     {
-    Path &path = s->pathIteratorCurrent();
+    Path &path = sol->pathIteratorCurrent();
     GMRATransportNode<double> *from = (GMRATransportNode<double> *) path.from;
     GMRATransportNode<double> *to = (GMRATransportNode<double> *) path.to;
     if(path.w > 0)
@@ -184,18 +181,6 @@ PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TVal
 
 }
 
-
-
-template< typename TSourcePointSet, typename TTargetPointSet, typename TValue >
-ModifiedTimeType
-PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TValue >
-::GetMTime() const
-{
-  ModifiedTimeType mtime = Superclass::GetMTime();
-  ModifiedTimeType m;
-
-  return mtime;
-}
 
 template< typename TSourcePointSet, typename TTargetPointSet, typename TValue >
 void

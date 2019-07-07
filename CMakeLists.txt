@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10.2)
 project(OptimalTransport)
 
-set(OptimalTransport_LIBRARIES OptimalTransport)
+#set(OptimalTransport_LIBRARIES OptimalTransport)
 
 #Eigen 3 is required
 if(NOT ITK_USE_SYSTEM_EIGEN)

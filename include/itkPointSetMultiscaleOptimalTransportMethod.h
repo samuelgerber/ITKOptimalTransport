@@ -43,7 +43,7 @@ public:
 
   /** Standard class type aliases. */
   using Self = PointSetMultiscaleOptimalTransportMethod;
-  using Superclass = ProcessObject;
+  using Superclass = PointSetOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TValue >;
   using Pointer = SmartPointer< Self >;
   using ConstPointer = SmartPointer< const Self >;
 
@@ -65,10 +65,12 @@ public:
   using NeighborhoodStrategyType = NeighborhoodStrategy<TValue>;
   using TransportType = TransportLPSolver<double>::TransportType;
 
-  itkSetMacro(PropagationStrategy1, PropagationStrategyType);
-  itkSetMacro(PropagationStrategy2, PropagationStrategyType);
+  using TransportCouplingType = typename Superclass::TransportCouplingType;
 
+  itkSetMacro(MatchScale, bool);
   itkBooleanMacro(MatchScale);
+
+  itkSetMacro(ScaleMass, bool);
   itkBooleanMacro(ScaleMass);
 
   itkSetMacro(TransportType, TransportType);

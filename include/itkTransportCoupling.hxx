@@ -53,7 +53,7 @@ void
 TransportCoupling<TSourcePointIdentifier, TTargetPointIdentifier, TValue>
 ::AddPath(TSourcePointIdentifier source, TTargetPointIdentifier target, TValue weight)
 {
-  m_Map.insert( TransportPath(source, target), weight);
+  m_Map[TransportPath(source, target)] = weight;
 }
 
 

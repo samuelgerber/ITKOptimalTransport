@@ -47,7 +47,7 @@ public:
   using TargetCoordRepType = typename TTargetPointSet::CoordRepType;
   using TargetPointIdentifier = typename TTargetPointSet::PointIdentifier;
   using TargetPointType = typename TTargetPointSet::PointType;
-  
+
   using TransportCouplingType = TransportCoupling<SourcePointIdentifier, TargetPointIdentifier, TValue>;
   using TransportCouplingPointer = typename TransportCouplingType::Pointer;
 
@@ -99,7 +99,7 @@ protected:
   void PrintSelf(std::ostream & os, Indent indent) const override;
 
   virtual void Initialize();
-  void GenerateData() override;
+
 
 private:
   TargetPointSetConstPointer m_TargetPointSet;

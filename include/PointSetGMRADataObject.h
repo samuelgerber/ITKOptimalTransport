@@ -17,7 +17,7 @@ class PointSetGMRADataObject : public GMRADataObject<typename TPointSetType::Pix
     typedef typename Eigen::Matrix<PixelType, Eigen::Dynamic, Eigen::Dynamic> MatrixXp;
     typedef typename Eigen::Matrix<PixelType, Eigen::Dynamic, 1> VectorXp;
 
-    PointSetGMRADataObject(PointSetPointer ps) : pointSet(ps){};
+    PointSetGMRADataObject(const PointSetType *ps) : pointSet(ps){};
 
     virtual VectorXp getPoint(int i){
        VectorXp p( this->dimension() );
@@ -34,7 +34,7 @@ class PointSetGMRADataObject : public GMRADataObject<typename TPointSetType::Pix
     }
 
   private:
-    PointSetPointer pointSet;
+    const PointSetType *pointSet;
 
 };
 
