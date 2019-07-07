@@ -84,6 +84,9 @@ void
 PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TValue >
 ::GenerateData()
 {
+
+  std::cout << this->GetSourcePointSet() << std::endl;
+
   //Create Source GMRA object
   PointSetGMRADataObject<TSourcePointSet> source( this->GetSourcePointSet() );
   std::vector<int> sourcePts(source.numberOfPoints() );
@@ -104,6 +107,8 @@ PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TVal
   gmraSource->minPoints = m_SourceMinimumPoints;
   gmraSource->addPoints(sourcePts);
 
+
+  std::cout << this->GetTargetPointSet() << std::endl;
 
   //Create Target GMRA object
   PointSetGMRADataObject<TTargetPointSet> target( this->GetTargetPointSet() );

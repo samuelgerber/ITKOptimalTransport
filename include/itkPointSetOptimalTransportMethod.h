@@ -103,7 +103,7 @@ protected:
 
 private:
   TargetPointSetConstPointer m_TargetPointSet;
-  SourcePointSetConstPointer  m_SourcePointSet;
+  SourcePointSetConstPointer m_SourcePointSet;
 
 };
 } // end namespace itk

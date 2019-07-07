@@ -20,6 +20,7 @@ class PointSetGMRADataObject : public GMRADataObject<typename TPointSetType::Pix
     PointSetGMRADataObject(const PointSetType *ps) : pointSet(ps){};
 
     virtual VectorXp getPoint(int i){
+       std::cout << i << std::endl;
        VectorXp p( this->dimension() );
        pointSet->GetPointData(i, p.data() );
        return p;
