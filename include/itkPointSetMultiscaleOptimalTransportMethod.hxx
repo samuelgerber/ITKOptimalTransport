@@ -22,6 +22,8 @@
 #include "PointSetGMRADataObject.h"
 #include "IKMTree.h"
 #include "LemonSolver.h"
+#include "IteratedCapacityPropagationStrategy.h"
+#include "EigenEuclideanMetric.h"
 
 namespace itk
 {
@@ -33,7 +35,7 @@ PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TVal
   m_Solver = new LemonSolver();
   m_PropagationStrategy1 = new IteratedCapacityPropagationStrategy<TValue>(3, 0);
   m_PropagationStrategy2 = new IteratedCapacityPropagationStrategy<TValue>(3, 0);
-  m_MaxNeighborhoodSize = NumericTraits<int>:::max();
+  m_MaxNeighborhoodSize = NumericTraits<int>::max();
   m_MatchScale = false;
   m_ScaleMass = false;
   m_Lambda = 0;
@@ -41,7 +43,7 @@ PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TVal
   m_Exponent = 2;
   m_NumberOfScalesSource = -1;
   m_NumberOfScalesTarget= -1;
-  m_TransportType = TransportLPSolver::BALANCED;
+  m_TransportType = TransportLPSolver<double>::BALANCED;
 
   m_SourceSplitCriterium = IKMTree<TValue>::ADAPTIVE;
   m_SourceStoppingCriterium = IKMTree<TValue>::RELATIVE_RADIUS;
@@ -78,6 +80,7 @@ void
 PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TValue >
 ::Initialize()
 {
+  Superclass::Initialize();
 }
 
 template< typename TSourcePointSet, typename TTargetPointSet, typename TValue >
@@ -148,7 +151,7 @@ PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TVal
   transport.setPropagationStrategy1(m_PropagationStrategy2);
   for(int i=0; i< m_NeighborhoodPropagations.size(); i++)
     {
-    transport.addNeighborhoodPropagationStrategy( m_NeighborhoodPropagations[i] );
+    transport.addNeighborhoodStrategy( m_NeighborhoodStrategies[i] );
     }
 
   std::vector< TransportPlan<double> * > sols = transport.solve( sourceLevels, targetLevels,
@@ -156,7 +159,19 @@ PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TVal
 
 
 
+  auto * transportOutput = static_cast< TransportCouplingType * >( this->ProcessObject::GetOutput(0) );
 
+  TransportPlan<double> *sol = sols[sols.size()-1];
+  for(sol->pathIteratorBegin(); ! sol->pathIteratorIsAtEnd(); sol->pathIteratorNext() )
+    {
+    Path &path = s->pathIteratorCurrent();
+    GMRATransportNode<double> *from = (GMRATransportNode<double> *) path.from;
+    GMRATransportNode<double> *to = (GMRATransportNode<double> *) path.to;
+    if(path.w > 0)
+      {
+      transportOutput->AddPath(from->getID(), to->getID(), path.w);
+      }
+    }
 
   delete gmraSource;
   delete gmraTarget;

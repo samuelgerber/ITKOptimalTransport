@@ -18,13 +18,16 @@
 #ifndef itkPointSetMultiscaleOptimalTransportMethod_h
 #define itkPointSetMultiscaleOptimalTransportMethod_h
 
-#include "itkPointSetMultiscaleOptimalTransportMethod.h"
+#include "itkPointSetOptimalTransportMethod.h"
 
 #include "TransportLPSolver.h"
 #include "PropagationStrategy.h"
 #include "NeighborhoodStrategy.h"
 
-namespace itk
+
+#include "IKMTree.h"
+
+namespace itk{
 
 /** \class PointSetOptimalTransportMethod
  * \brief Base class for computing optimal transport on PointSets.
@@ -58,8 +61,9 @@ public:
   using TargetPointSetType = TTargetPointSet;
   using TargetPointSetConstPointer = typename TargetPointSetType::ConstPointer;
 
-  using PropagationStrategyType = typename PropagationStrategy<TValue>;
-  using NeighborhoodStrategyType = typename NieghborhoodStrategy<TValue>;
+  using PropagationStrategyType = PropagationStrategy<TValue>;
+  using NeighborhoodStrategyType = NeighborhoodStrategy<TValue>;
+  using TransportType = TransportLPSolver<double>::TransportType;
 
   itkSetMacro(PropagationStrategy1, PropagationStrategyType);
   itkSetMacro(PropagationStrategy2, PropagationStrategyType);
@@ -76,22 +80,29 @@ public:
   itkSetMacro(MassCost, double);
   itkGetMacro(MassCost, double);
 
-  void AddNeighborhoodPropagationStrategy(NeighborhoodPropagationStrategy *strategy);
+  void AddNeighborhoodPropagationStrategy(NeighborhoodStrategyType *strategy)
+    {
+    m_NeighborhoodStrategies.push_back(strategy);
+    }
+
 
 protected:
   PointSetMultiscaleOptimalTransportMethod();
-  ~PointSetMultiscaleOptimalTransportMethod() override = default;
+  virtual ~PointSetMultiscaleOptimalTransportMethod();
   void PrintSelf(std::ostream & os, Indent indent) const override;
 
   void GenerateData() override;
 
 private:
 
+  using StoppingCriterium = IKMTree<double>::StoppingCriterium;
+  using SplitCriterium = IKMTree<double>::SplitCriterium;
+
   /**
    * Multiscale transport solver settings
    */
   LPSolver *m_Solver;
-  std::vector< NeighborhoodStrategyType* > m_NeighborhoodPropagations;
+  std::vector< NeighborhoodStrategyType* > m_NeighborhoodStrategies;
   PropagationStrategyType *m_PropagationStrategy1;
   PropagationStrategyType *m_PropagationStrategy2;
   bool m_MatchScale;
@@ -108,7 +119,7 @@ private:
    * GMRA (mutliscale point set representation settings)
    */
   SplitCriterium m_SourceSplitCriterium;
-  StoppingCriterium m_SourceStopCriterium;
+  StoppingCriterium m_SourceStoppingCriterium;
   int m_SourceMinimumPoints;
   int m_SourceMaxIterations;
   double m_SourceEpsilon;
@@ -116,7 +127,7 @@ private:
   double m_SourceThreshold;
 
   SplitCriterium m_TargetSplitCriterium;
-  StoppingCriterium m_TargetStopCriterium;
+  StoppingCriterium m_TargetStoppingCriterium;
   int m_TargetMinimumPoints;
   int m_TargetMaxIterations;
   double m_TargetEpsilon;

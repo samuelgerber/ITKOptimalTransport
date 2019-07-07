@@ -28,6 +28,16 @@ if(NOT ot_fetch_POPULATED)
   add_subdirectory( ${ot_fetch_SOURCE_DIR} ${ot_fetch_BINARY_DIR} )
 endif()
 
+#Need manual icludes for now: Fix ot CMakelists
+INCLUDE_DIRECTORIES( ${ot_fetch_SOURCE_DIR}/.
+                     ${ot_fetch_SOURCE_DIR}/lib
+                     ${ot_fetch_SOURCE_DIR}/external/gmra/lib
+                     ${ot_fetch_SOURCE_DIR}/external/gmra/external/utils/lib
+                     ${ot_fetch_SOURCE_DIR}/external/gmra/external/kmeans/lib
+                     ${ot_fetch_SOURCE_DIR}/external/gmra/external/randomsvd/lib
+                     ${ot_fetch_SOURCE_DIR}/external/gmra/external/metrics/lib
+                     ${EIGEN3_INCLUDE_DIR} 
+                     )
 
 
 if(NOT ITK_SOURCE_DIR)

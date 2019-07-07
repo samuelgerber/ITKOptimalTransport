@@ -22,21 +22,21 @@
 
 namespace itk
 {
-template<typename TSourePointIdentifier, typename TTargetPointIdentifier, typename TValue>
+template<typename TSourcePointIdentifier, typename TTargetPointIdentifier, typename TValue>
 TransportCoupling<TSourcePointIdentifier, TTargetPointIdentifier, TValue>
 ::TransportCoupling()
 {
 
 }
 
-template<typename TSourePointIdentifier, typename TTargetPointIdentifier, typename TValue>
+template<typename TSourcePointIdentifier, typename TTargetPointIdentifier, typename TValue>
 TransportCoupling<TSourcePointIdentifier, TTargetPointIdentifier, TValue>
 ::~TransportCoupling()
 {
 
 }
 
-template<typename TSourePointIdentifier, typename TTargetPointIdentifier, typename TValue>
+template<typename TSourcePointIdentifier, typename TTargetPointIdentifier, typename TValue>
 void
 TransportCoupling<TSourcePointIdentifier, TTargetPointIdentifier, TValue>
 ::PrintSelf( std::ostream &os, Indent indent ) const
@@ -48,17 +48,17 @@ TransportCoupling<TSourcePointIdentifier, TTargetPointIdentifier, TValue>
 }
 
 
-template<typename TSourePointIdentifier, typename TTargetPointIdentifier, typename TValue>
+template<typename TSourcePointIdentifier, typename TTargetPointIdentifier, typename TValue>
 void
 TransportCoupling<TSourcePointIdentifier, TTargetPointIdentifier, TValue>
-::AddPath(TSourePointIdentifier source, TTargetPointIdentifier target, TValue weight)
+::AddPath(TSourcePointIdentifier source, TTargetPointIdentifier target, TValue weight)
 {
   m_Map.insert( TransportPath(source, target), weight);
 }
 
 
-template<typename TSourePointIdentifier, typename TTargetPointIdentifier, typename TValue>
-TransportMap &
+template<typename TSourcePointIdentifier, typename TTargetPointIdentifier, typename TValue>
+typename TransportCoupling<TSourcePointIdentifier, TTargetPointIdentifier, TValue>::TransportMap &
 TransportCoupling<TSourcePointIdentifier, TTargetPointIdentifier, TValue>
 ::GetMap()
 {

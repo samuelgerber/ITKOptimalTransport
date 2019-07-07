@@ -31,25 +31,25 @@
 namespace itk
 {
 
-/** \class TransportPlam
+/** \class TransportCoupling
  *  \brief
  *
  *  */
 
 template<typename TSourePointIdentifier, typename TTargetPointIdentifier, typename TValue = double>
-class ITK_TEMPLATE_EXPORT TransportCoupling:public Object
+class ITK_TEMPLATE_EXPORT TransportCoupling:public DataObject
 {
 public:
-  ITK_DISALLOW_COPY_AND_ASSIGN(TransportPlan);
+  ITK_DISALLOW_COPY_AND_ASSIGN(TransportCoupling);
 
   /** Standard class type aliases */
-  using Self = TransportPlan;
+  using Self = TransportCoupling;
   using Superclass = Object;
   using Pointer = SmartPointer< Self >;
   using ConstPointer = SmartPointer< const Self >;
 
   /** Run-time type information (and related methods) */
-  itkTypeMacro(TransportPlan, Object);
+  itkTypeMacro(TransportCoupling, Object);
 
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
@@ -79,7 +79,7 @@ private:
 } // end of namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkTransportPlan.hxx"
+#include "itkTransportCoupling.hxx"
 #endif
 
 #endif

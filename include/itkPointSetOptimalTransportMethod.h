@@ -1,4 +1,4 @@
-*=========================================================================
+/*=========================================================================
  *
  *  Copyright Insight Software Consortium
  *
@@ -20,11 +20,12 @@
 
 #include "itkProcessObject.h"
 #include "itkPointSet.h"
-#include "itkDataObjectDecorator.h"
+#include "itkDataObject.h"
 #include "itkTransportCoupling.h"
 
 
 namespace itk
+{
 
 /** \class PointSetOptimalTransportMethod
  * \brief Base class for computing optimal transport on PointSets.
@@ -46,10 +47,9 @@ public:
   using TargetCoordRepType = typename TTargetPointSet::CoordRepType;
   using TargetPointIdentifier = typename TTargetPointSet::PointIdentifier;
   using TargetPointType = typename TTargetPointSet::PointType;
-
-
-  using TransportCouplingType = typename TransportCoupling<SourcePointIdentifier, TargetPointIdentifier, TValue>
-  using TransportCouplingPointer = typename TransportCoupling::Pointer;
+  
+  using TransportCouplingType = TransportCoupling<SourcePointIdentifier, TargetPointIdentifier, TValue>;
+  using TransportCouplingPointer = typename TransportCouplingType::Pointer;
 
   /** Standard class type aliases. */
   using Self = PointSetOptimalTransportMethod;
@@ -98,12 +98,12 @@ protected:
   ~PointSetOptimalTransportMethod() override = default;
   void PrintSelf(std::ostream & os, Indent indent) const override;
 
+  virtual void Initialize();
   void GenerateData() override;
 
 private:
   TargetPointSetConstPointer m_TargetPointSet;
   SourcePointSetConstPointer  m_SourcePointSet;
-  TransportCouplingPointer m_TransportCoupling;
 
 };
 } // end namespace itk

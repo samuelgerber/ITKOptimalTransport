@@ -30,7 +30,7 @@ PointSetOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TValue >
   this->SetNumberOfRequiredOutputs(1);
 
 
-  TransportCouplingOutputPointer output =
+  TransportCouplingPointer output =
     itkDynamicCastInDebugMode< TransportCouplingType * >(this->MakeOutput(0).GetPointer() );
 
   this->ProcessObject::SetNthOutput( 0, output.GetPointer() );
@@ -52,21 +52,17 @@ PointSetOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TValue >
     itkExceptionMacro(<< "TargetPointSet is not present");
     }
 
-
-  // Connect the transform to the Decorator
-  auto * transportOutput = static_cast< TransportCouplingType * >( this->ProcessObject::GetOutput(0) );
-
-  transportOutput->Set( m_TransportCoupling );
 }
 
-
+/*
 template< typename TSourcePointSet, typename TTargetPointSet, typename TValue >
-const typename PointSetOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TValue >::TransformOutputType *
+const typename PointSetOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TValue >::Tra *
 PointSetOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TValue >
 ::GetOutput() const
 {
   return static_cast< const TransportCouplingType * >( this->ProcessObject::GetOutput(0) );
 }
+*/
 
 template< typename TSourcePointSet, typename TTargetPointSet, typename TValue >
 DataObject::Pointer
