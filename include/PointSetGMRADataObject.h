@@ -11,6 +11,7 @@ class PointSetGMRADataObject : public GMRADataObject<typename TPointSetType::Pix
   public:
 
     using PointSetType = TPointSetType;
+    using PointType = typename TPointSetType::PointType;
     using PointSetPointer = typename TPointSetType::Pointer;
     using PixelType = typename TPointSetType::PixelType;
 
@@ -21,7 +22,10 @@ class PointSetGMRADataObject : public GMRADataObject<typename TPointSetType::Pix
 
     virtual VectorXp getPoint(int i){
        VectorXp p( this->dimension() );
-       pointSet->GetPointData(i, p.data() );
+       PointType tmp = pointSet->GetPoint(i);
+       for(int i=0; i<this->dimension(); i++){
+         p[i] = tmp[i];
+       }
        return p;
     };
 

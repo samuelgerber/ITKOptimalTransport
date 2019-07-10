@@ -53,7 +53,7 @@ PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TVal
   //TODO need to fix epsilon set to 0 bug
   m_SourceEpsilon = 0.00000001;
   m_SourceNumberOfKids = 8;
-  m_SourceThreshold = 0;
+  m_SourceThreshold = 0.000001;
   m_SourceMaxIterations = 100;
   m_SourceMinimumPoints = 1;
 
@@ -61,7 +61,7 @@ PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TVal
   m_TargetStoppingCriterium = IKMTree<TValue>::RELATIVE_RADIUS;
   m_TargetEpsilon = 0.00000001;
   m_TargetNumberOfKids = 8;
-  m_TargetThreshold = 0;
+  m_TargetThreshold = 0.00001;
   m_TargetMaxIterations = 100;
   m_TargetMinimumPoints = 1;
 }
