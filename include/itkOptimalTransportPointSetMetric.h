@@ -18,7 +18,8 @@
 #ifndef itkOptimalTransportPointSetMetric_h
 #define itkOptimalTransportPointSetMetric_h
 
-#include "itkPointSetToPointSetMetricv4.h"
+#include "itkPointSetToPointSetMetric2v4.h"
+#include "itkTransportCoupling.h"
 
 namespace itk
 {
@@ -41,14 +42,14 @@ namespace itk
 template<typename TFixedPointSet, typename TMovingPointSet = TFixedPointSet,
   class TInternalComputationValueType = double>
 class ITK_TEMPLATE_EXPORT OptimalTransportPointSetMetric:
-  public PointSetToPointSetMetricv4<TFixedPointSet, TMovingPointSet, TInternalComputationValueType>
+  public PointSetToPointSetMetric2v4<TFixedPointSet, TMovingPointSet, TInternalComputationValueType>
 {
 public:
   ITK_DISALLOW_COPY_AND_ASSIGN(OptimalTransportPointSetMetric);
 
   /** Standard class type aliases. */
   using Self = OptimalTransportPointSetMetric;
-  using Superclass = PointSetToPointSetMetricv4<TFixedPointSet, TMovingPointSet,
+  using Superclass = PointSetToPointSetMetric2v4<TFixedPointSet, TMovingPointSet,
     TInternalComputationValueType>;
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
@@ -57,7 +58,7 @@ public:
   itkNewMacro( Self );
 
   /** Run-time type information (and related methods). */
-  itkTypeMacro( OptimalTransportPointSetMetric, PointSetToPointSetMetricv4 );
+  itkTypeMacro( OptimalTransportPointSetMetric, PointSetToPointSetMetric2v4 );
 
   /** Types transferred from the base class */
   using MeasureType = typename Superclass::MeasureType;
@@ -66,17 +67,24 @@ public:
   using PointType = typename Superclass::PointType;
   using PixelType = typename Superclass::PixelType;
   using PointIdentifier = typename Superclass::PointIdentifier;
-
+  using TransportCoupling = typename TransportCoupling< PointIdentifier,
+                                                        PointIdentifier,
+                                                        double >;
+  using TransportMap = typename TransportCoupling::TransportMap;
+  using TransportEntry = typename TransportCoupling::TransportEntry;
   /**
    * Calculates the local metric value for a single point.
    */
-  MeasureType GetLocalNeighborhoodValue( const PointType &, const PixelType & pixel = 0 ) const override;
+  MeasureType GetLocalNeighborhoodValue( const PointIdentifier &, const PixelType & pixel = 0 ) const override;
 
   /**
    * Calculates the local value and derivative for a single point.
    */
-  void GetLocalNeighborhoodValueAndDerivative( const PointType &,
+  void GetLocalNeighborhoodValueAndDerivative( const PointIdentifier &,
     MeasureType &, LocalDerivativeType &, const PixelType & pixel = 0 ) const override;
+
+  itkSetObjectMacro(Coupling, TransportCoupling);
+  itkGetObjectMacro(Coupling, TransportCoupling);
 
 protected:
   OptimalTransportPointSetMetric() = default;
@@ -84,6 +92,9 @@ protected:
 
   /** PrintSelf function */
   void PrintSelf( std::ostream & os, Indent indent ) const override;
+
+private:
+  TransportCoupling::Pointer m_Coupling;
 };
 } // end namespace itk
 

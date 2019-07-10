@@ -87,6 +87,10 @@ public:
     m_NeighborhoodStrategies.push_back(strategy);
     }
 
+  typename TransportCouplingType::Pointer GetCoupling()
+    {
+    return static_cast< TransportCouplingType * >( this->ProcessObject::GetOutput(0) );
+    }
 
 protected:
   PointSetMultiscaleOptimalTransportMethod();

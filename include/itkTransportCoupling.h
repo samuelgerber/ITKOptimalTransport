@@ -54,8 +54,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  using TransportPath = std::pair< TSourePointIdentifier, TTargetPointIdentifier>;
-  using TransportMap = std::map< TransportPath, TValue>;
+  using TransportMap = std::vector< std::map<TTargetPointIdentifier, TValue> >;
 
   void AddPath(TSourePointIdentifier source, TTargetPointIdentifier target, TValue weight);
 

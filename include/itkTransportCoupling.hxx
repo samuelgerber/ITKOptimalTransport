@@ -44,7 +44,7 @@ TransportCoupling<TSourcePointIdentifier, TTargetPointIdentifier, TValue>
   Superclass::PrintSelf( os, indent );
 
   os << indent << "TransportCoupling: ";
-  os << indent << m_Map.size() << " paths";
+  os << indent << m_Map.size() << " sources";
 }
 
 
@@ -53,7 +53,8 @@ void
 TransportCoupling<TSourcePointIdentifier, TTargetPointIdentifier, TValue>
 ::AddPath(TSourcePointIdentifier source, TTargetPointIdentifier target, TValue weight)
 {
-  m_Map[TransportPath(source, target)] = weight;
+  m_Map.resize( std::max(m_Map.size(), source+1) );
+  m_Map[source][target] = weight;
 }
 
 

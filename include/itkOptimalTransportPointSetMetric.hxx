@@ -27,32 +27,38 @@ template<typename TFixedPointSet, typename TMovingPointSet, class TInternalCompu
 typename OptimalTransportPointSetMetric<TFixedPointSet, TMovingPointSet, TInternalComputationValueType>
 ::MeasureType
 OptimalTransportPointSetMetric<TFixedPointSet, TMovingPointSet, TInternalComputationValueType>
-::GetLocalNeighborhoodValue( const PointType & point, const PixelType & itkNotUsed( pixel ) ) const
+::GetLocalNeighborhoodValue( const PointIdentifier fixedIndex, const PixelType & itkNotUsed( pixel ) ) const
 {
-  PointType closestPoint;
-  closestPoint.Fill( 0.0 );
+  PointType &fixedPoint = this->m_FixedTransformedPointSet->GetPoint(fixedIndex);
 
-  PointIdentifier pointId = this->m_MovingTransformedPointsLocator->FindClosestPoint( point );
-  closestPoint = this->m_MovingTransformedPointSet->GetPoint( pointId );
-
-  const MeasureType distance = point.EuclideanDistanceTo( closestPoint );
+  std::vector< TransportEntry > &targets = m_Coupling->GetMap()[fixedIndex];
+  MeasureType distance = 0;
+  for(int i=0; i<targets.size(); i++)
+    {
+    PointType &movingPoint = this->m_MoivingTransformedPointSet->GetPoint( targets[i].first );
+    distance += targets[i].second * point.EuclideanDistanceTo( closestPoint );
+    }
   return distance;
 }
 
 template<typename TFixedPointSet, typename TMovingPointSet, class TInternalComputationValueType>
 void
 OptimalTransportPointSetMetric<TFixedPointSet, TMovingPointSet, TInternalComputationValueType>
-::GetLocalNeighborhoodValueAndDerivative( const PointType & point,
+::GetLocalNeighborhoodValueAndDerivative( const PointIdentifier fixedIndex,
   MeasureType &measure, LocalDerivativeType & localDerivative, const PixelType & itkNotUsed( pixel ) ) const
 {
-  PointType closestPoint;
-  closestPoint.Fill( 0.0 );
 
-  PointIdentifier pointId = this->m_MovingTransformedPointsLocator->FindClosestPoint( point );
-  closestPoint = this->m_MovingTransformedPointSet->GetPoint( pointId );
+  PointType &fixedPoint = this->m_FixedTransformedPointSet->GetPoint(fixedIndex);
 
-  measure = point.EuclideanDistanceTo( closestPoint );
-  localDerivative = closestPoint - point;
+  std::vector< TransportEntry > &targets = m_Coupling->GetMap()[fixedIndex];
+  MeasureType distance = 0;
+  for(int i=0; i<targets.size(); i++)
+    {
+    PointType &movingPoint = this->m_MoivingTransformedPointSet->GetPoint( targets[i].first );
+    distance += targets[i].second * point.EuclideanDistanceTo( closestPoint );
+    localDerivative += (movingPoint - fixedPoint) * targets[i].second;
+    }
+  measure = distance;
 }
 
 /** PrintSelf method */

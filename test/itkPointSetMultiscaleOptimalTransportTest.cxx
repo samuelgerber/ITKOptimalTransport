@@ -91,8 +91,10 @@ int itkPointSetMultiscaleOptimalTransportTest( int argc, char *argv[] )
 
   ot->Update();
 
-  //OptimalTransportType::TransportCouplingPointer coupling = ot->GetOutput()
+  std::cout << "Update called" << std::endl;
 
+  typename OptimalTransportType::TransportCouplingType::Pointer coupling = ot->GetCoupling();
+  std::cout << coupling << std::endl;
 
   return EXIT_SUCCESS;
 }
