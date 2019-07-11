@@ -67,24 +67,22 @@ public:
   using PointType = typename Superclass::PointType;
   using PixelType = typename Superclass::PixelType;
   using PointIdentifier = typename Superclass::PointIdentifier;
-  using TransportCoupling = typename TransportCoupling< PointIdentifier,
-                                                        PointIdentifier,
-                                                        double >;
-  using TransportMap = typename TransportCoupling::TransportMap;
-  using TransportEntry = typename TransportCoupling::TransportEntry;
+  using TransportCouplingType = TransportCoupling< PointIdentifier, PointIdentifier, double >;
+  using TransportEntry = typename TransportCouplingType::TransportEntry;
+  using TransportMap = typename TransportCouplingType::TransportMap;
   /**
    * Calculates the local metric value for a single point.
    */
-  MeasureType GetLocalNeighborhoodValue( const PointIdentifier &, const PixelType & pixel = 0 ) const override;
+  MeasureType GetLocalNeighborhoodValue( const PointIdentifier , const PixelType & pixel = 0 ) const override;
 
   /**
    * Calculates the local value and derivative for a single point.
    */
-  void GetLocalNeighborhoodValueAndDerivative( const PointIdentifier &,
+  void GetLocalNeighborhoodValueAndDerivative( const PointIdentifier ,
     MeasureType &, LocalDerivativeType &, const PixelType & pixel = 0 ) const override;
 
-  itkSetObjectMacro(Coupling, TransportCoupling);
-  itkGetObjectMacro(Coupling, TransportCoupling);
+  itkSetObjectMacro(Coupling, TransportCouplingType);
+  itkGetObjectMacro(Coupling, TransportCouplingType);
 
 protected:
   OptimalTransportPointSetMetric() = default;
@@ -93,8 +91,17 @@ protected:
   /** PrintSelf function */
   void PrintSelf( std::ostream & os, Indent indent ) const override;
 
+  bool RequiresMovingPointsLocator() const override
+    {
+    return false;
+    };
+
+  bool RequiresFixedPointsLocator() const override
+    {
+    return false;
+    }
 private:
-  TransportCoupling::Pointer m_Coupling;
+  typename TransportCouplingType::Pointer m_Coupling;
 };
 } // end namespace itk
 

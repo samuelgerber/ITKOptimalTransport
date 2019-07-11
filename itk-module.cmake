@@ -14,7 +14,11 @@ file(READ "${MY_CURRENT_DIR}/README.rst" DOCUMENTATION)
 itk_module(OptimalTransport
   DEPENDS
     ITKCommon
-    ITKStatistics
+    ITKStatistics    
+    ITKMetricsv4
+    ITKRegistrationMethodsv4
+    ITKOptimizersv4
+    ITKOptimizers
   COMPILE_DEPENDS
     ITKImageSources
   TEST_DEPENDS

@@ -50,18 +50,17 @@ PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TVal
 
   m_SourceSplitCriterium = IKMTree<TValue>::ADAPTIVE_FIXED;
   m_SourceStoppingCriterium = IKMTree<TValue>::RELATIVE_RADIUS;
-  //TODO need to fix epsilon set to 0 bug
-  m_SourceEpsilon = 0.00000001;
+  m_SourceEpsilon = 0;
   m_SourceNumberOfKids = 8;
-  m_SourceThreshold = 0.000001;
+  m_SourceThreshold = 0;
   m_SourceMaxIterations = 100;
   m_SourceMinimumPoints = 1;
 
   m_TargetSplitCriterium = IKMTree<TValue>::ADAPTIVE_FIXED;
   m_TargetStoppingCriterium = IKMTree<TValue>::RELATIVE_RADIUS;
-  m_TargetEpsilon = 0.00000001;
+  m_TargetEpsilon = 0;
   m_TargetNumberOfKids = 8;
-  m_TargetThreshold = 0.00001;
+  m_TargetThreshold = 0;
   m_TargetMaxIterations = 100;
   m_TargetMinimumPoints = 1;
 }
@@ -159,6 +158,7 @@ PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TVal
 
 
   auto * transportOutput = static_cast< TransportCouplingType * >( this->ProcessObject::GetOutput(0) );
+  transportOutput->AlloacteMap( source.numberOfPoints() );
 
   using Path = TransportPlan<double>::Path;
   TransportPlan<double> *sol = sols[sols.size()-1];
@@ -170,8 +170,15 @@ PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TVal
     GMRATransportNode<double> *to = (GMRATransportNode<double> *) path.to;
     if(path.w > 0)
       {
-      std::cout << path.w << ": " << from->getID() << " -> " << to->getID() << std::endl;
-      transportOutput->AddPath(from->getID(), to->getID(), path.w);
+      std::vector<int> fromIndex = from->getPoints();
+      std::vector<int> toIndex = to->getPoints();
+      for(int i=0; i<fromIndex.size(); i++)
+        {
+        for(int j=0; j< toIndex.size(); j++)
+          {
+          transportOutput->AddPath(fromIndex[i], toIndex[j], path.w / toIndex.size() );
+          }
+        }
       }
     }
 

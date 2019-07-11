@@ -29,7 +29,8 @@ if(NOT ot_fetch_POPULATED)
 endif()
 
 #Need manual icludes for now: Fix ot CMakelists
-INCLUDE_DIRECTORIES( ${ot_fetch_SOURCE_DIR}/.
+INCLUDE_DIRECTORIES( ./include
+                     ${ot_fetch_SOURCE_DIR}/.
                      ${ot_fetch_SOURCE_DIR}/lib
                      ${ot_fetch_SOURCE_DIR}/external/gmra/lib
                      ${ot_fetch_SOURCE_DIR}/external/gmra/external/utils/lib
@@ -49,4 +50,4 @@ else()
   itk_module_impl()
 endif()
 
-
+add_subdirectory("examples")

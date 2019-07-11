@@ -26,7 +26,8 @@
 #include "itkObject.h"
 #include "itkArray.h"
 
-
+#include <fstream>
+#include <iostream>
 
 namespace itk
 {
@@ -53,12 +54,31 @@ public:
 
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
-
-  using TransportMap = std::vector< std::map<TTargetPointIdentifier, TValue> >;
+  using TransportEntry = std::map<TTargetPointIdentifier, TValue>;
+  using TransportMap = std::vector< TransportEntry >;
 
   void AddPath(TSourePointIdentifier source, TTargetPointIdentifier target, TValue weight);
 
   TransportMap &GetMap();
+
+  void AlloacteMap(int size)
+    {
+    m_Map.resize(size);
+    }
+
+  void SaveToCsv( std::string filename )
+    {
+    std::ofstream myfile;
+    myfile.open (filename);
+    for(int i=0; i<m_Map.size(); i++)
+      {
+      for(typename TransportEntry::iterator it=m_Map[i].begin(); it != m_Map[i].end(); ++it)
+        {
+        myfile << i << " , " << it->first << " , " << it->second << std::endl;
+        }
+      }
+    myfile.close();
+    }
 
 protected:
   /** Constructor */

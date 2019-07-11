@@ -17,13 +17,53 @@
  *=========================================================================*/
 
 #include "itkMersenneTwisterRandomVariateGenerator.h"
-//#include "itkPointSetOptimalTransportMethod.h"
-#include "../include/itkPointSetMultiscaleOptimalTransportMethod.h"
-//#include "itkPointSetMultiscaleOptimalTransportMethod.h"
-
+#include "itkPointSetMultiscaleOptimalTransportMethod.h"
+#include "itkOptimalTransportPointSetMetric.h"
+#include "itkGradientDescentOptimizerv4.h"
+#include "itkRegistrationParameterScalesFromPhysicalShift.h"
+#include "itkCommand.h"
+#include "itkMersenneTwisterRandomVariateGenerator.h"
+#include "itkImageRegistrationMethodv4.h"
+#include "itkAffineTransform.h"
 #include <fstream>
 #include <iostream>
 
+template<typename TFilter>
+class itkPointSetMetricRegistrationTestCommandIterationUpdate : public itk::Command
+{
+public:
+  using Self = itkPointSetMetricRegistrationTestCommandIterationUpdate;
+
+  using Superclass = itk::Command;
+  using Pointer = itk::SmartPointer<Self>;
+  itkNewMacro( Self );
+
+protected:
+  itkPointSetMetricRegistrationTestCommandIterationUpdate() = default;
+
+public:
+
+  void Execute(itk::Object *caller, const itk::EventObject & event) override
+    {
+    Execute( (const itk::Object *) caller, event);
+    }
+
+  void Execute(const itk::Object * object, const itk::EventObject & event) override
+    {
+    if( typeid( event ) != typeid( itk::IterationEvent ) )
+      {
+      return;
+      }
+    const auto * optimizer = dynamic_cast< const TFilter * >( object );
+
+    if( !optimizer )
+      {
+      itkGenericExceptionMacro( "Error dynamic_cast failed" );
+      }
+    std::cout << "It: " << optimizer->GetCurrentIteration() << " metric value: " << optimizer->GetCurrentMetricValue();
+    std::cout << std::endl;
+    }
+};
 
 
 
@@ -95,6 +135,93 @@ int itkPointSetMultiscaleOptimalTransportTest( int argc, char *argv[] )
 
   typename OptimalTransportType::TransportCouplingType::Pointer coupling = ot->GetCoupling();
   std::cout << coupling << std::endl;
+
+
+  using PixelType = double;
+  using FixedImageType = itk::Image<PixelType, Dimension>;
+  using MovingImageType = itk::Image<PixelType, Dimension>;
+
+  FixedImageType::SizeType fixedImageSize;
+  FixedImageType::PointType fixedImageOrigin;
+  FixedImageType::DirectionType fixedImageDirection;
+  FixedImageType::SpacingType fixedImageSpacing;
+
+  fixedImageSize.Fill( 600 );
+  fixedImageOrigin.Fill( -300 );
+  fixedImageDirection.SetIdentity();
+  fixedImageSpacing.Fill( 1 );
+
+  FixedImageType::Pointer fixedImage = FixedImageType::New();
+  fixedImage->SetRegions( fixedImageSize );
+  fixedImage->SetOrigin( fixedImageOrigin );
+  fixedImage->SetDirection( fixedImageDirection );
+  fixedImage->SetSpacing( fixedImageSpacing );
+  fixedImage->Allocate();
+
+  using AffineTransformType = itk::AffineTransform<double, Dimension>;
+  AffineTransformType::Pointer transform = AffineTransformType::New();
+  transform->SetIdentity();
+
+  using PointSetMetricType = itk::OptimalTransportPointSetMetric<PointSetType>;
+  PointSetMetricType::Pointer metric = PointSetMetricType::New();
+  metric->SetCoupling( coupling );
+  metric->SetMovingTransform( transform );
+  metric->SetFixedPointSet( fixedPoints );
+  metric->SetMovingPointSet( movingPoints );
+  metric->SetVirtualDomainFromImage( fixedImage );
+  metric->Initialize();
+
+  // scales estimator
+  using RegistrationParameterScalesFromShiftType =
+          itk::RegistrationParameterScalesFromPhysicalShift< PointSetMetricType >;
+  RegistrationParameterScalesFromShiftType::Pointer shiftScaleEstimator =
+          RegistrationParameterScalesFromShiftType::New();
+  shiftScaleEstimator->SetMetric( metric );
+  // needed with pointset metrics
+  shiftScaleEstimator->SetVirtualDomainPointSet( metric->GetVirtualTransformedPointSet() );
+
+  // optimizer
+  using OptimizerType = itk::GradientDescentOptimizerv4;
+  OptimizerType::Pointer  optimizer = OptimizerType::New();
+  optimizer->SetMetric( metric );
+  optimizer->SetNumberOfIterations( numberOfIterations );
+  optimizer->SetScalesEstimator( shiftScaleEstimator );
+  optimizer->SetMaximumStepSizeInPhysicalUnits( 3 );
+
+  using CommandType = itkPointSetMetricRegistrationTestCommandIterationUpdate<OptimizerType>;
+  CommandType::Pointer observer = CommandType::New();
+  optimizer->AddObserver( itk::IterationEvent(), observer );
+  optimizer->SetMinimumConvergenceValue( 0.0 );
+  optimizer->SetConvergenceWindowSize( 10 );
+
+  using AffineRegistrationType = itk::ImageRegistrationMethodv4<FixedImageType, MovingImageType, AffineTransformType, FixedImageType, PointSetType>;
+  AffineRegistrationType::Pointer affineSimple = AffineRegistrationType::New();
+  affineSimple->SetNumberOfLevels(1);
+  affineSimple->SetObjectName( "affineSimple" );
+  affineSimple->SetFixedPointSet( fixedPoints );
+  affineSimple->SetMovingPointSet( movingPoints );
+  affineSimple->SetInitialTransform( transform );
+  affineSimple->SetMetric( metric );
+  affineSimple->SetOptimizer( optimizer );
+
+   try
+    {
+    std::cout << "Trimmed point set affine registration update" << std::endl;
+    affineSimple->Update();
+    }
+  catch( itk::ExceptionObject &e )
+    {
+    std::cerr << "Exception caught: " << e << std::endl;
+    return EXIT_FAILURE;
+    }
+/*
+  if(metric->GetValue() < 2){
+    return EXIT_SUCCESS;
+  }
+  else{
+    return EXIT_FAILURE;
+  }
+*/
 
   return EXIT_SUCCESS;
 }
