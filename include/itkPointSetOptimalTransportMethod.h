@@ -82,9 +82,6 @@ public:
   itkSetConstObjectMacro(TargetPointSet, TargetPointSetType);
   itkGetConstObjectMacro(TargetPointSet, TargetPointSetType);
 
-
-
-
   /** Make a DataObject of the correct type to be used as the specified
    * output. */
   using DataObjectPointerArraySizeType = ProcessObject::DataObjectPointerArraySizeType;
@@ -100,7 +97,6 @@ protected:
 
   virtual void Initialize();
 
-
 private:
   TargetPointSetConstPointer m_TargetPointSet;
   SourcePointSetConstPointer m_SourcePointSet;
@@ -113,4 +109,3 @@ private:
 #endif
 
 #endif
-

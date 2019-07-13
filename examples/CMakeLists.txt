@@ -1,6 +1,6 @@
 add_executable( OptimalTransportRegistrationExample OptimalTransportRegistrationExample.cxx )
  
-target_link_libraries( OptimalTransportRegistrationExample ${ITK_LIBRARIES})
+target_link_libraries( OptimalTransportRegistrationExample ${ITK_LIBRARIES}) 
 
 set_target_properties( OptimalTransportRegistrationExample  
     PROPERTIES

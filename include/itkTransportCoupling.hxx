@@ -19,7 +19,9 @@
 #define itkTransportCoupling_hxx
 
 #include "itkTransportCoupling.h"
-
+/*
+ *\ingroup OptimalTransport"
+ */
 namespace itk
 {
 template<typename TSourcePointIdentifier, typename TTargetPointIdentifier, typename TValue>

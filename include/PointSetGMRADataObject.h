@@ -3,20 +3,20 @@
 
 
 #include <Eigen/Dense>
-
+#include "GMRADataObject.h"
 
 
 template <typename TPointSetType>
-class PointSetGMRADataObject : public GMRADataObject<typename TPointSetType::PixelType>{
+class PointSetGMRADataObject : public GMRADataObject<double>{
   public:
 
     using PointSetType = TPointSetType;
     using PointType = typename TPointSetType::PointType;
     using PointSetPointer = typename TPointSetType::Pointer;
-    using PixelType = typename TPointSetType::PixelType;
+    using CoordRepType = typename TPointSetType::CoordRepType;
 
-    typedef typename Eigen::Matrix<PixelType, Eigen::Dynamic, Eigen::Dynamic> MatrixXp;
-    typedef typename Eigen::Matrix<PixelType, Eigen::Dynamic, 1> VectorXp;
+    typedef typename Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> MatrixXp;
+    typedef typename Eigen::Matrix<double, Eigen::Dynamic, 1> VectorXp;
 
     PointSetGMRADataObject(const PointSetType *ps) : pointSet(ps){};
 

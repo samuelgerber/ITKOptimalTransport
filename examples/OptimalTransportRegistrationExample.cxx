@@ -90,7 +90,7 @@ void runRegistration( PointSetType::Pointer fixedPoints,
                       FixedImageType::Pointer fixedImage,
                       std::string filename){
 
-  unsigned int numberOfIterations = 1000;
+  unsigned int numberOfIterations = 100;
 
   using AffineTransformType = itk::AffineTransform<double, Dimension>;
   AffineTransformType::Pointer transform = AffineTransformType::New();
@@ -193,7 +193,7 @@ int main( int argc, char *argv[] )
 {
   constexpr unsigned int Dimension = 2;
 
-  unsigned int numberOfIterations = 100;
+  unsigned int numberOfIterations = 500;
   if( argc > 1 )
     {
     numberOfIterations = std::stoi( argv[1] );
@@ -228,7 +228,7 @@ int main( int argc, char *argv[] )
     fixedPoints->SetPoint( i, fixedPoint );
     }
 
-  unsigned int nTargetPoints= 4200;
+  unsigned int nTargetPoints= 401;
   for(int i=0; i< nTargetPoints; i++ )
     {
     float radius = 100.0;
@@ -291,13 +291,15 @@ int main( int argc, char *argv[] )
   itk::TimeProbe clock;
   clock.Start();
 
+  PointSetType::Pointer fixedTransformedPoints = fixedPoints;
+  for(int i=0; i<3; i++){
   using OptimalTransportType = itk::PointSetMultiscaleOptimalTransportMethod<PointSetType, PointSetType, double>;
   OptimalTransportType::Pointer ot = OptimalTransportType::New();
-  ot->SetSourcePointSet( fixedPoints );
+  ot->SetSourcePointSet( fixedTransformedPoints );
   ot->SetTargetPointSet( movingPoints );
   ot->SetScaleMass(false);
-  ot->SetTransportType( TransportLPSolver<double>::UNBALANCED_FREE_SOURCE );
-  ot->SetMassCost( 1500 );
+  ot->SetTransportType( TransportLPSolver<double>::UNBALANCED_FREE );
+  ot->SetMassCost( 10000 );
   ot->Update();
   typename OptimalTransportType::TransportCouplingType::Pointer coupling = ot->GetCoupling();
   coupling->SaveToCsv( "ot-unbalanced-coupling.csv" );
@@ -312,6 +314,8 @@ int main( int argc, char *argv[] )
   metric->Initialize();
   runRegistration<PointSetMetricType>(fixedPoints, movingPoints, metric, fixedImage, "ot-unbalanced.csv");
 
+  fixedTransformedPoints =  metric->GetFixedTransformedPointSet();
+  }
   clock.Stop();
   std::cout << "OT2 Metric Time : " << clock.GetTotal() << std::endl;
   }

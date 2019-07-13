@@ -63,9 +63,9 @@ namespace itk
  * The virtual domain point set can be retrieved from the metric using the
  * GetVirtualTransformedPointSet() method.
  *
+ *\ingroup OptimalTransport"
  * \ingroup ITKMetricsv4
  */
-
 template<typename TFixedPointSet,  typename TMovingPointSet,
   class TInternalComputationValueType = double>
 class ITK_TEMPLATE_EXPORT PointSetToPointSetMetric2v4
@@ -175,8 +175,6 @@ public:
   using VirtualPointSetType = typename Superclass::VirtualPointSetType;
   using VirtualPointSetPointer = typename Superclass::VirtualPointSetPointer;
 
-
-
   /**
    * For now return the number of points used in the value/derivative calculations.
    */
@@ -253,11 +251,6 @@ public:
     itkExceptionMacro("Method not supported");
     }
 
-
-
-
-
-
 protected:
   PointSetToPointSetMetric2v4();
   ~PointSetToPointSetMetric2v4() override = default;
@@ -272,7 +265,6 @@ private:
   using PointIdentifierPair = std::pair<PointIdentifier, PointIdentifier>;
   using PointIdentifierRanges = std::vector<PointIdentifierPair>;
   const PointIdentifierRanges CreateRanges() const;
-
 
 };
 } // end namespace itk

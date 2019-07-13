@@ -23,7 +23,7 @@
 
 #include "itkPoint.h"
 #include "itkSize.h"
-#include "itkObject.h"
+#include "itkDataObject.h"
 #include "itkArray.h"
 
 #include <fstream>
@@ -31,14 +31,13 @@
 
 namespace itk
 {
-
 /** \class TransportCoupling
  *  \brief
  *
- *  */
-
+ *  
+ */
 template<typename TSourePointIdentifier, typename TTargetPointIdentifier, typename TValue = double>
-class ITK_TEMPLATE_EXPORT TransportCoupling:public DataObject
+class ITK_TEMPLATE_EXPORT TransportCoupling : public DataObject
 {
 public:
   ITK_DISALLOW_COPY_AND_ASSIGN(TransportCoupling);
@@ -87,10 +86,7 @@ protected:
 
   void PrintSelf( std::ostream & os, Indent indent ) const override;
 
-
-
 private:
-
   TransportMap m_Map;
 
 };  // end of class

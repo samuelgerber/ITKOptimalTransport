@@ -27,6 +27,7 @@
 #include "GMRANeighborhood.h"
 #include "GMRAMultiscaleTransport.h"
 #include "MultiscaleTransportLP.h"
+#include "ExpandNeighborhoodStrategy.h"
 
 namespace itk
 {
@@ -50,19 +51,22 @@ PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TVal
 
   m_SourceSplitCriterium = IKMTree<TValue>::ADAPTIVE_FIXED;
   m_SourceStoppingCriterium = IKMTree<TValue>::RELATIVE_RADIUS;
-  m_SourceEpsilon = 0;
+  m_SourceEpsilon = 0.0;
   m_SourceNumberOfKids = 8;
-  m_SourceThreshold = 0;
+  m_SourceThreshold = 0.0;
   m_SourceMaxIterations = 100;
   m_SourceMinimumPoints = 1;
 
   m_TargetSplitCriterium = IKMTree<TValue>::ADAPTIVE_FIXED;
   m_TargetStoppingCriterium = IKMTree<TValue>::RELATIVE_RADIUS;
-  m_TargetEpsilon = 0;
+  m_TargetEpsilon = 0.0;
   m_TargetNumberOfKids = 8;
-  m_TargetThreshold = 0;
+  m_TargetThreshold = 0.0;
   m_TargetMaxIterations = 100;
   m_TargetMinimumPoints = 1;
+
+  //Add a default neighborhood strategy
+  m_NeighborhoodStrategies.push_back( new ExpandNeighborhoodStrategy<double>( 1.5, 0, 1) );
 }
 
 
@@ -91,7 +95,8 @@ PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TVal
     sourceWeights[i] = 1.0;
   };
 
-  IKMTree<double> *gmraSource = new IKMTree<double>( &source );
+  std::cout << "Building Source GMRA" << std::endl;
+  IKMTree<double> *gmraSource = new IKMTree<double>(  &source );
   gmraSource->setStoppingCriterium( m_SourceStoppingCriterium );
   gmraSource->setSplitCriterium( m_SourceSplitCriterium );
   gmraSource->dataFactory = new L2GMRAKmeansDataFactory<double>();
@@ -102,6 +107,7 @@ PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TVal
   gmraSource->minPoints = m_SourceMinimumPoints;
   gmraSource->addPoints( sourcePts );
 
+  std::cout << "Source GMRA built" << std::endl;
 
   //Create Target GMRA object
   PointSetGMRADataObject<TTargetPointSet> target( this->GetTargetPointSet() );
@@ -122,7 +128,7 @@ PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TVal
   gmraTarget->minPoints = m_TargetMinimumPoints;
   gmraTarget->addPoints( targetPts );
 
-  std::cout << targetPts.size() << std::endl;
+  std::cout << "Target GMRA built" << std::endl;
 
   NodeDistance<double> *distS = new CenterNodeDistance<double>( new EuclideanMetric<double>() );
   gmraSource->computeRadii(distS);
@@ -154,8 +160,6 @@ PointSetMultiscaleOptimalTransportMethod< TSourcePointSet, TTargetPointSet, TVal
 
   std::vector< TransportPlan<double> * > sols = transport.solve( sourceLevels, targetLevels,
       m_Exponent, m_NumberOfScalesSource, m_NumberOfScalesTarget, m_MatchScale, m_ScaleMass);
-
-
 
   auto * transportOutput = static_cast< TransportCouplingType * >( this->ProcessObject::GetOutput(0) );
   transportOutput->AlloacteMap( source.numberOfPoints() );
