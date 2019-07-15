@@ -215,11 +215,11 @@ class TransportLPSolver {
         sourceMassSupply = massTotal;
         //sourceMassSinkLower = 0;
         //sourceMassSinkUpper = massSource;
-        sourceMassSink = -massSource + 0.5*massMinimal;
+        sourceMassSink = -massSource + 0. * massMinimal;
 
         //targetMassSupplyLower = 0;
         //targetMassSupplyUpper = massTarget;
-        targetMassSupply = massTarget - 0.5*massMinimal;
+        targetMassSupply = massTarget - 0. * massMinimal;
         //targetMassSinkLower = 0;
         //targetMassSinkUpper = massTotal;
         targetMassSink = -massTotal;
@@ -323,13 +323,13 @@ class TransportLPSolver {
 
         int pid = sourceMassSupplyDistributionStart + n->getID();
         solver->setColumnBoundsLower( pid, lower);
-        //solver->setColumnBounds( pid, lower, wfactor * upper);
+        solver->setColumnBounds( pid, lower, 0.99999 * upper);
         solver->setColumnObjective( pid,  massDeltaCost );
         solver->setColumnCoefficients( pid, sourceMassSupplyNode, n->getID() ); //, 1, -1 );
 
         pid = sourceMassSinkDistributionStart + n->getID();
         solver->setColumnBoundsLower( pid, lower);
-        //solver->setColumnBounds( pid, lower, upper);
+        solver->setColumnBounds( pid, lower, 0.99999*upper);
         solver->setColumnObjective( pid,  massDeltaCost );
         solver->setColumnCoefficients( pid, n->getID(), sourceMassSinkNode); //, 1, -1 );
       }
@@ -348,13 +348,13 @@ class TransportLPSolver {
         
         int pid = targetMassSinkDistributionStart + n->getID();
         solver->setColumnBoundsLower( pid, lower);//
-        //solver->setColumnBounds( pid, lower, wfactor * upper);
+        solver->setColumnBounds( pid, lower, 0.99999 * upper);
         solver->setColumnObjective( pid,  massDeltaCost );
         solver->setColumnCoefficients( pid, offset + n->getID(), targetMassSinkNode ); //, 1, -1  );
 
         pid = targetMassSupplyDistributionStart + n->getID();
         solver->setColumnBoundsLower( pid, lower);
-        //solver->setColumnBounds( pid, lower, upper);
+        solver->setColumnBounds( pid, lower, 0.99999*upper);
         solver->setColumnObjective( pid,  massDeltaCost );
         solver->setColumnCoefficients( pid, targetMassSupplyNode, offset + n->getID() ); //, 1, -1  );
       }
